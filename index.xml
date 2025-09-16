@@ -1,4 +1,80 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>My New Hugo Site</title><link>https://songronghu.github.io/</link><description>Recent content on My New Hugo Site</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 14 Sep 2025 07:28:23 +0800</lastBuildDate><atom:link href="https://songronghu.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>My First Blog</title><link>https://songronghu.github.io/posts/my-first-blog/</link><pubDate>Sun, 14 Sep 2025 07:28:23 +0800</pubDate><guid>https://songronghu.github.io/posts/my-first-blog/</guid><description>
 &lt;h2 id="2025-09-14"&gt;2025-09-14&lt;/h2&gt;
 &lt;p&gt;a happy day!
-so cool&lt;/p&gt;</description></item></channel></rss>
+so cool&lt;/p&gt;</description></item><item><title>使用hugo搭建个人博客</title><link>https://songronghu.github.io/posts/deploy_personal_blog/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://songronghu.github.io/posts/deploy_personal_blog/</guid><description>
+&lt;div id="outline-container-headline-1" class="outline-2"&gt;
+&lt;h2 id="headline-1"&gt;
+下载hugo安装包
+&lt;/h2&gt;
+&lt;div id="outline-text-headline-1" class="outline-text-2"&gt;
+&lt;p&gt;
+https://github.com/gohugoio/hugo/releases&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id="outline-container-headline-2" class="outline-2"&gt;
+&lt;h2 id="headline-2"&gt;
+解压并移动到/usr/local/bin
+&lt;/h2&gt;
+&lt;div id="outline-text-headline-2" class="outline-text-2"&gt;
+&lt;div class="src src-sh"&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-sh" data-lang="sh"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; cd ~/Downloads
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; tar xvf hugo_extended_0.150.0_Linux-64bit.tar.gz
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; sudo mv hugo /usr/local/bin&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id="outline-container-headline-3" class="outline-2"&gt;
+&lt;h2 id="headline-3"&gt;
+创建博客目录并下载主题
+&lt;/h2&gt;
+&lt;div id="outline-text-headline-3" class="outline-text-2"&gt;
+&lt;div class="src src-sh"&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-sh" data-lang="sh"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; hugo new site myblog
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; cd myblog
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; git init
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; git submodule add https://github.com/chipzoller/hugo-clarity themes/hugo-clarity&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id="outline-container-headline-4" class="outline-2"&gt;
+&lt;h2 id="headline-4"&gt;
+创建first-blog.md
+&lt;/h2&gt;
+&lt;div id="outline-text-headline-4" class="outline-text-2"&gt;
+&lt;div class="src src-sh"&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-sh" data-lang="sh"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; hugo new posts/first-blog.md&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id="outline-container-headline-5" class="outline-2"&gt;
+&lt;h2 id="headline-5"&gt;
+修改draft默认配置
+&lt;/h2&gt;
+&lt;div id="outline-text-headline-5" class="outline-text-2"&gt;
+&lt;div class="src src-text"&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; vim archetypes/default.md
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; +++
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; date = &amp;#39;{{ .Date }}&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; draft = false
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; title = &amp;#39;{{ replace .File.ContentBaseName &amp;#34;-&amp;#34; &amp;#34; &amp;#34; | title }}&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; +++&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id="outline-container-headline-6" class="outline-2"&gt;
+&lt;h2 id="headline-6"&gt;
+建立blog仓库，push后借助github Action和github Page自动发布自己的博客
+&lt;/h2&gt;
+&lt;div id="outline-text-headline-6" class="outline-text-2"&gt;
+&lt;div id="outline-container-headline-7" class="outline-3"&gt;
+&lt;h3 id="headline-7"&gt;
+建立Page仓库，此仓库名必须是：username.github.io
+&lt;/h3&gt;
+&lt;div id="outline-text-headline-7" class="outline-text-3"&gt;
+&lt;div id="outline-container-headline-8" class="outline-4"&gt;
+&lt;h4 id="headline-8"&gt;
+生成personal_token
+&lt;/h4&gt;
+&lt;div id="outline-text-headline-8" class="outline-text-4"&gt;
+&lt;p&gt;访问github依次打开设置：Settings-&amp;gt;Developer Settings-&amp;gt; Personal access tokens -&amp;gt; tokens (classic)，
+generate-new-token，需要有repo权限&lt;/p&gt;</description></item></channel></rss>
