@@ -1,4 +1,54 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on My Blog</title><link>https://songronghu.github.io/posts/</link><description>Recent content in Posts on My Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 03 Dec 2025 22:36:55 +0800</lastBuildDate><atom:link href="https://songronghu.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>TCP 发送数据 核心流程</title><link>https://songronghu.github.io/posts/2025-12-03/</link><pubDate>Wed, 03 Dec 2025 22:36:55 +0800</pubDate><guid>https://songronghu.github.io/posts/2025-12-03/</guid><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on My Blog</title><link>https://songronghu.github.io/posts/</link><description>Recent content in Posts on My Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 04 Dec 2025 12:07:25 +0800</lastBuildDate><atom:link href="https://songronghu.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>TCP 接收报文 流程分析</title><link>https://songronghu.github.io/posts/2025-12-04/</link><pubDate>Thu, 04 Dec 2025 12:07:25 +0800</pubDate><guid>https://songronghu.github.io/posts/2025-12-04/</guid><description>
+&lt;h2 id="tcp接收报文流程分析"&gt;TCP接收报文流程分析&lt;/h2&gt;
+&lt;p&gt;&lt;figure&gt;
+&lt;picture&gt;
+&lt;img
+loading="lazy"
+decoding="async"
+alt=""
+class="image_figure image_internal image_unprocessed"
+src="https://songronghu.github.io/images/2025-12-04_2025_12_19_12_05_37.png"
+/&gt;
+&lt;/picture&gt;
+&lt;/figure&gt;
+&lt;a href="https://www.taohui.pub/2016/01/26/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B3-tcp%E6%B6%88%E6%81%AF%E7%9A%84%E6%8E%A5%E6%94%B6/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B3/"&gt;引用：TCP消息的接收&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id="一-整体流程概览"&gt;一、整体流程概览&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;服务器端接收 TCP 报文&lt;/strong&gt; 的内核逻辑。 大体过程如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;网卡收到报文&lt;/strong&gt; → 交给内核协议栈。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TCP 层&lt;/strong&gt; 检查序列号是否在期望窗口内。&lt;/li&gt;
+&lt;li&gt;根据顺序插入不同的队列：
+&lt;ul&gt;
+&lt;li&gt;正常顺序 → 放入 &lt;code&gt;receive_queue&lt;/code&gt; ；&lt;/li&gt;
+&lt;li&gt;超前包（乱序）→ 放入 &lt;code&gt;out_of_order_queue&lt;/code&gt; 。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;当缺失的包到达后，触发 reordering，把 &lt;code&gt;out_of_order&lt;/code&gt; 中的连续数据搬到
+&lt;code&gt;receive_queue&lt;/code&gt; 。&lt;/li&gt;
+&lt;li&gt;用户进程调用 &lt;code&gt;recv()&lt;/code&gt; ：
+&lt;ul&gt;
+&lt;li&gt;如果数据已在 &lt;code&gt;receive_queue&lt;/code&gt; → 直接拷贝到用户缓冲区；&lt;/li&gt;
+&lt;li&gt;如果没有数据 → 阻塞等待或立即返回（非阻塞）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="二-四个队列的作用与位置"&gt;二、四个队列的作用与位置&lt;/h3&gt;
+&lt;h4 id="backlog-队列"&gt;1️⃣ backlog 队列&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;作用&lt;/strong&gt; ：保存还未被应用层 &lt;code&gt;accept()&lt;/code&gt; 的连接。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;位置&lt;/strong&gt; ：属于 &lt;code&gt;listen socket&lt;/code&gt; ，即服务器监听套接字。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;说明&lt;/strong&gt; ：
+&lt;ul&gt;
+&lt;li&gt;TCP 三次握手完成后，内核把新连接放入 backlog 队列；&lt;/li&gt;
+&lt;li&gt;应用层调用 &lt;code&gt;accept()&lt;/code&gt; 时，从 backlog 取出一个连接生成新的
+&lt;code&gt;established socket&lt;/code&gt; ；&lt;/li&gt;
+&lt;li&gt;一旦生成，接下来的数据接收就交给该新 socket
+的接收队列体系（即下面几个队列）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;所以 backlog 队列不存放数据包，只存放“还未被 accept 的连接请求”。&lt;/p&gt;</description></item><item><title>TCP 发送数据 核心流程</title><link>https://songronghu.github.io/posts/2025-12-03/</link><pubDate>Wed, 03 Dec 2025 22:36:55 +0800</pubDate><guid>https://songronghu.github.io/posts/2025-12-03/</guid><description>
 &lt;h2 id="mss-作用解析"&gt;MSS 作用解析&lt;/h2&gt;
 &lt;h3 id="mss-是什么"&gt;MSS 是什么？&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;MSS（Maximum Segment Size，最大报文段长度）&lt;/strong&gt;
